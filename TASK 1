@@ -1,0 +1,55 @@
+import os
+import shutil
+import zipfile
+from datetime import datetime
+directory = "C:\FILES"
+def rename_files(directory, prefix="file"):
+    files = os.listdir(directory)
+    for index, file in enumerate(files):
+        old_path = os.path.join(directory, file)
+        extension = os.path.splitext(file)[1]  # Get file extension
+        new_name = f"{prefix}_{index + 1}{extension}"
+        new_path = os.path.join(directory, new_name)
+        os.rename(old_path, new_path)
+    print("Files renamed successfully.")
+
+rename_files(directory)
+
+def sort_by_type(directory):
+    files = os.listdir(directory)
+    for file in files:
+        file_path = os.path.join(directory, file)
+        if os.path.isfile(file_path):
+            extension = os.path.splitext(file)[1][1:]  # Remove dot (.)
+            folder_path = os.path.join(directory, extension.upper())  # Create a folder by type
+            os.makedirs(folder_path, exist_ok=True)
+            shutil.move(file_path, os.path.join(folder_path, file))
+    print("Files sorted by type successfully.")
+
+sort_by_type(directory)
+def sort_by_date(directory):
+    files = os.listdir(directory)
+    for file in files:
+        file_path = os.path.join(directory, file)
+        if os.path.isfile(file_path):
+            modified_time = os.path.getmtime(file_path)
+            folder_name = datetime.fromtimestamp(modified_time).strftime('%Y-%m-%d')  # Format date
+            folder_path = os.path.join(directory, folder_name)
+            os.makedirs(folder_path, exist_ok=True)
+            shutil.move(file_path, os.path.join(folder_path, file))
+    print("Files sorted by date successfully.")
+
+sort_by_date(directory)
+def zip_files(directory, zip_name="Archived_Files.zip"):
+    with zipfile.ZipFile(os.path.join(directory, zip_name), 'w') as zipf:
+        for root, _, files in os.walk(directory):
+            for file in files:
+                file_path = os.path.join(root, file)
+                zipf.write(file_path, os.path.relpath(file_path, directory))  # Preserve folder structure
+    print("Files zipped successfully.")
+
+zip_files(directory)
+rename_files(directory)
+sort_by_type(directory)
+sort_by_date(directory)
+zip_files(directory)
